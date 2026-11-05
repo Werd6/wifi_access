@@ -1,19 +1,21 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101827"><title>Guest WiFi | Secure Access</title><style>
 :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#e9f0ff;background:#0b1220}*{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at top,#20345a,#0b1220 60%)}main{width:min(100%,440px);background:#131e32;border:1px solid #354360;border-radius:24px;padding:27px;box-shadow:0 24px 70px #0008}header{display:flex;gap:12px;align-items:center;margin-bottom:24px}.logo{background:#284e87;padding:12px;border-radius:14px;font-size:25px}.muted{color:#a8b6d1;font-size:13px}h1{font-size:24px;margin:4px 0 12px}h2{font-size:20px;margin:12px 0}p{line-height:1.5}button,.button{font:inherit;display:block;width:100%;padding:15px;border-radius:12px;border:0;background:#6faaff;color:#06152b;font-weight:750;cursor:pointer;margin:12px 0}button.secondary{background:#2c3c57;color:#f1f5ff}button:disabled{opacity:.5;cursor:not-allowed}input{width:100%;padding:13px;background:#0d1729;color:white;border:1px solid #51617b;border-radius:10px;font:inherit}video{width:100%;max-height:300px;object-fit:cover;border-radius:12px;background:#07101d;transform:scaleX(-1)}.bar{height:12px;border-radius:20px;background:#2a3852;overflow:hidden;margin:22px 0}.fill{height:100%;background:linear-gradient(90deg,#5c95ff,#7ff4d4);width:0;transition:width .2s}.center{text-align:center}.big{font-size:70px;text-align:center;margin:18px 0}.hidden{display:none!important}.panel{padding:17px;border-radius:14px;background:#0c172a;border:1px solid #334361;margin:14px 0}.tag{font-size:11px;color:#95bcff;letter-spacing:.13em;text-transform:uppercase}.password{font-size:24px;font-weight:800;overflow-wrap:anywhere;letter-spacing:.02em}#selfie{width:100%;max-height:270px;object-fit:contain;border-radius:12px;margin-top:12px}#goat{font-size:125px;animation:zoom .22s infinite alternate;filter:drop-shadow(0 0 35px #ff4b40)}@keyframes zoom{to{transform:scale(1.3) rotate(-7deg)}}.shaky{animation:shake .13s infinite}@keyframes shake{0%{transform:translate(4px,2px)}50%{transform:translate(-5px,-3px)}100%{transform:translate(2px,4px)}}.fine{font-size:12px;color:#9daecb;margin-top:18px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choices button{margin:0;padding:13px 5px}.qr{background:white;padding:13px;border-radius:12px;width:max-content;max-width:100%;margin:15px auto}.qr img{width:220px;max-width:100%;display:block}.error{color:#ff9a9a}.success{color:#8eeac4}
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.board button{margin:0;padding:0;aspect-ratio:1;font-size:42px;background:#0c172a;color:#e9f0ff;border:1px solid #334361}.board button:disabled{opacity:1;cursor:default}.mazegrid{display:grid;gap:2px;width:min(100%,300px);margin:14px auto;padding:6px;border-radius:12px;background:#0c172a}.mazegrid div{aspect-ratio:1;border-radius:3px;display:grid;place-items:center;font-size:18px;background:#16233b}.mazegrid .wall{background:#4a5b7c}.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:190px;margin:10px auto}.pad button{margin:0;padding:11px 0}.reels{display:flex;justify-content:center;gap:10px;font-size:54px;margin:16px 0}.reels span{background:#0c172a;border:1px solid #334361;border-radius:14px;padding:6px 12px}.arena{position:relative;height:300px;border:1px dashed #354360;border-radius:14px;overflow:hidden;margin:14px 0}.arena button{position:absolute;width:auto;margin:0;padding:12px 16px;white-space:nowrap;transition:left .15s,top .15s}.tos{max-height:300px;overflow:auto;padding:14px;border-radius:14px;background:#0c172a;border:1px solid #334361;font-size:13px;color:#c4d0e6}.tos p{margin:0 0 12px}label{display:block;font-size:13px;color:#a8b6d1;margin:12px 0 5px}input[type=range]{padding:0;border:0;background:none}.phone{font-size:30px;font-weight:800;text-align:center;letter-spacing:.03em;margin:16px 0;font-variant-numeric:tabular-nums}
 </style></head><body><main><header><div class="logo">📶</div><div><strong>Guest Network</strong><div class="muted">Secure access gateway · WPA2/WPA3</div></div></header><div id="screen"></div><div class="fine center">Guest network portal · Connection services</div></main><script>
 const $=document.getElementById('screen');
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 const btn=(label,fn,cls='')=>{const b=document.createElement('button');b.textContent=label;b.className=cls;b.addEventListener('click',fn);return b};
 const set=html=>{$.innerHTML=html};
-function finish(){document.body.classList.remove('shaky');set(`<div class="tag">Challenge complete</div><h1 class="success">✓ Guest Access Approved</h1><p>Congratulations. Your dignity was a small price to pay.</p><div class="panel center"><div class="big">📶</div><h2>Ask Drew for the WiFi.</h2><p class="muted">Only Drew can give you the password.</p></div>`);$.append(btn('Try another challenge',start,'secondary'));}
+function finish(){document.body.classList.remove('shaky');set(`<div class="tag">Challenge complete</div><h1 class="success">✓ Guest Access Approved</h1><p>Congratulations. Your dignity was a small price to pay.</p><div class="panel center"><div class="big">📶</div><h2>Ask Drew for the WiFi.</h2><p class="muted">Only Drew can give you the password.</p></div>`);$.append(btn('See the Hall of Fame',()=>{location.href='gallery.html'}),btn('Try another challenge',randomPrank,'secondary'));}
 function face(){
-  set(`<div class="tag">Identity verification</div><h1>Facial Recognition Required</h1><p>To request guest WiFi, allow camera access and take a selfie for our very serious face scan.</p><div class="panel center" id="camBox"><div class="big">📷</div><p>Camera is off</p></div><p class="fine">Your photo is processed only in this browser. It is not uploaded or saved.</p>`);
+  set(`<div class="tag">Identity verification</div><h1>Facial Recognition Required</h1><p>To request guest WiFi, allow camera access and take a selfie for our very serious face scan.</p><div class="panel center" id="camBox"><div class="big">📷</div><p>Camera is off</p></div><p class="fine">Heads up: your selfie gets saved to the Hall of Fame for other guests to admire.</p>`);
   const box=document.getElementById('camBox');
   $.append(btn('Enable camera',async()=>{
-    if(!navigator.mediaDevices?.getUserMedia){box.innerHTML='<p class="error">Camera access is unavailable. Open this site over HTTPS on your phone.</p>';return}
+    const skip=()=>{if(!document.getElementById('skipFace')){const s=btn('Skip the face scan',randomPrank,'secondary');s.id='skipFace';$.append(s)}};
+    if(!navigator.mediaDevices?.getUserMedia){box.innerHTML='<p class="error">Camera access is unavailable. Open this site over HTTPS on your phone.</p>';skip();return}
     let stream;
     try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false})}
-    catch(e){box.innerHTML='<p class="error">Camera permission was not granted. Allow camera access in your browser to continue.</p>';return}
+    catch(e){box.innerHTML='<p class="error">Camera permission was not granted. Allow camera access in your browser to continue.</p>';skip();return}
     if(!box.isConnected){stream.getTracks().forEach(t=>t.stop());return}
     box.replaceChildren();
     const video=document.createElement('video');video.autoplay=true;video.playsInline=true;video.muted=true;video.srcObject=stream;box.append(video);
@@ -21,6 +23,7 @@ function face(){
       if(!video.videoWidth){return}
       const canvas=document.createElement('canvas');canvas.width=320;canvas.height=Math.round(320*video.videoHeight/video.videoWidth);
       canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+      canvas.toBlob(jpg=>{if(jpg)fetch('api/selfie',{method:'POST',headers:{'content-type':'image/jpeg'},body:jpg}).catch(err=>console.warn('Selfie upload failed:',err))},'image/jpeg',0.75);
       stream.getTracks().forEach(t=>t.stop());video.srcObject=null;
       box.replaceChildren();const photo=document.createElement('img');photo.id='selfie';photo.alt='Selfie captured on this device';photo.src=canvas.toDataURL('image/jpeg',0.75);box.append(photo);
       capture.remove();
@@ -29,7 +32,7 @@ function face(){
         for(let i=0;i<=100;i+=10){document.getElementById('fill').style.width=i+'%';await delay(180)}
         const insults=['Face recognized. Unfortunately, so is the disappointment.','Biometrics passed. Your haircut did not.','Identity confirmed. The router wishes it had not looked.','Face detected. Confidence in your life choices: 2%.','Your face is valid. Your vibes are not.'];
         set(`<div class="tag error">Facial evaluation complete</div><div class="big">🤨</div><h1>Chud Detected.</h1><p>${insults[Math.floor(Math.random()*insults.length)]}</p>`);
-        $.append(btn('Accept humiliation & continue',finish));
+        $.append(btn('Accept humiliation & continue',randomPrank));
       });$.append(verify);
     });$.append(capture);
   }));
@@ -114,5 +117,169 @@ function captcha(){
   show();
 }
 function history(){set('<div class="tag">Guest network</div><h1>Connect to WiFi?</h1><p>Tap below to connect to the guest network.</p>');$.append(btn('Connect to WiFi',async()=>{set('<h1>Scanning Search History</h1><div class="bar"><div class="fill" id="fill"></div></div>');for(let i=0;i<=100;i+=5){document.getElementById('fill').style.width=i+'%';await delay(85)}set('<div class="big">🤨</div><h1>Wow, that was pretty weird bro.</h1>');$.append(btn('Continue',finish));}));}
-const pranks=[face,goat,shake,captcha,history];function start(){pranks[Math.floor(Math.random()*pranks.length)]()}start();
+function ttt(){
+  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const b=Array(9).fill('');let over=false;
+  set('<div class="tag">Network game</div><h1>Beat the Router at Tic Tac Toe</h1><p>Win one game and the WiFi is yours. You are X.</p><div class="board" id="board"></div><p class="center" id="msg">Your move.</p>');
+  const board=document.getElementById('board'),msg=document.getElementById('msg');
+  const cells=b.map((_,i)=>{const c=btn('',()=>play(i));board.append(c);return c});
+  const draw=()=>cells.forEach((c,i)=>{c.textContent=b[i];c.disabled=over||!!b[i]});
+  const winner=p=>lines.find(l=>l.every(i=>b[i]===p));
+  const empty=()=>b.map((v,i)=>v?-1:i).filter(i=>i>=0);
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  function best(){for(const p of['O','X'])for(const l of lines){const e=l.filter(i=>!b[i]);if(e.length===1&&l.filter(i=>b[i]===p).length===2)return e[0]}return b[4]?pick(empty()):4}
+  function end(text){over=true;draw();msg.textContent=text.trim();$.append(btn('Continue',finish))}
+  async function play(i){
+    if(over||b[i])return;b[i]='X';over=true;draw();let cheat='';
+    if(winner('X')){
+      await delay(550);
+      while(winner('X')){
+        const v=pick(winner('X'));
+        const spots=empty().filter(s=>{b[v]='';b[s]='X';const ok=!winner('X');b[s]='';b[v]='X';return ok});
+        if(spots.length&&Math.random()<.5){b[v]='';b[pick(spots)]='X';cheat='Your X slipped. Physics, probably.'}
+        else{b[v]='O';cheat='Your X has defected.'}
+      }
+      msg.textContent=cheat;draw();await delay(900);
+    }else await delay(350);
+    if(!board.isConnected)return;
+    if(winner('O'))return end(cheat+' The router wins again.');
+    if(!empty().length)return end(cheat+' Draw. Ties go to the house. The router wins again.');
+    b[best()]='O';
+    if(winner('O'))return end(cheat+' The router wins again.');
+    if(!empty().length)return end(cheat+' Draw. Ties go to the house. The router wins again.');
+    over=false;draw();msg.textContent=cheat?cheat+' Your move.':'Your move.';
+  }
+  draw();
+}
+function rps(){
+  const beats={Rock:'Paper',Paper:'Scissors',Scissors:'Rock'},icon={Rock:'🪨',Paper:'📄',Scissors:'✂️'};
+  let losses=0,target=2;
+  function show(note){
+    set(`<div class="tag">Network duel · Best of ${target*2-1}</div><h1>Rock, Paper, Scissors</h1><p>Win the match and the router hands over the WiFi.</p><div class="panel center"><div style="font-size:48px" id="rpsPlay">❔</div><p id="rpsMsg">${note||'Choose your weapon.'}</p><p class="muted">You 0 · Router ${losses}</p></div><div class="choices" id="choices" style="grid-template-columns:repeat(3,1fr)"></div>`);
+    const box=document.getElementById('choices');
+    Object.keys(beats).forEach(k=>box.append(btn(icon[k]+' '+k,async()=>{
+      box.querySelectorAll('button').forEach(x=>x.disabled=true);
+      const play=document.getElementById('rpsPlay'),msg=document.getElementById('rpsMsg');
+      play.textContent=icon[k]+' vs ❔';await delay(600);
+      const r=beats[k];play.textContent=icon[k]+' vs '+icon[r];losses++;
+      msg.textContent=`${r} beats ${k}. Router wins the round.`;
+      await delay(1200);if(!box.isConnected)return;
+      if(losses===1&&target===2){target=3;return show('Rule update: this is now best of 5.')}
+      if(losses>=target){set(`<div class="big">🏆</div><h1>Router wins ${losses}-0.</h1><p>The router read your mind. It does that.</p>`);$.append(btn('Continue',finish));return}
+      show();
+    })));
+  }
+  show();
+}
+function maze(){
+  const g=['#########','#...#...#','#.#.#.#.#','#.#...#.#','#.#####.#','#...#...#','###.#.#.#','#.....#.#','#########'].map(r=>[...r]);
+  let pos=[1,1],exits=[[0,7],[4,8],[8,1],[0,3]],exit=[8,7],moves=0;g[8][7]='E';
+  set('<div class="tag">Network routing</div><h1>Find the Exit</h1><p>Guide your packet 🔵 to the exit 🚪 to connect. Use the arrows or your keyboard.</p><div class="mazegrid" id="mz" style="grid-template-columns:repeat(9,1fr)"></div><p class="center" id="mzMsg">Packet ready.</p><div class="pad" id="pad"></div>');
+  const mz=document.getElementById('mz'),msg=document.getElementById('mzMsg'),pad=document.getElementById('pad');
+  const draw=()=>{mz.innerHTML=g.map((r,y)=>r.map((c,x)=>`<div class="${c==='#'?'wall':''}">${y===pos[0]&&x===pos[1]?'🔵':c==='E'?'🚪':''}</div>`).join('')).join('')};
+  const near=(a,b)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])===1;
+  function move(dy,dx){
+    if(!mz.isConnected)return;
+    const n=[pos[0]+dy,pos[1]+dx];if(g[n[0]]?.[n[1]]!=='.')return;pos=n;
+    if(near(pos,exit)){
+      g[exit[0]][exit[1]]='#';
+      const options=exits.filter(e=>!near(pos,e));
+      if(options.length){exit=options[Math.floor(Math.random()*options.length)];exits=exits.filter(e=>e!==exit);g[exit[0]][exit[1]]='E';msg.textContent='The exit has been relocated for your security.'}
+      else{exit=[-9,-9];msg.textContent='All exits have been permanently relocated. Into the void.'}
+      if(++moves===3)$.append(btn('Give up',()=>{removeEventListener('keydown',key);finish()},'secondary'));
+    }
+    draw();
+  }
+  function key(e){if(!mz.isConnected){removeEventListener('keydown',key);return}const d={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[e.key];if(d){e.preventDefault();move(...d)}}
+  addEventListener('keydown',key);
+  [[null],['↑',-1,0],[null],['←',0,-1],['↓',1,0],['→',0,1]].forEach(([label,dy,dx])=>pad.append(label?btn(label,()=>move(dy,dx),'secondary'):document.createElement('div')));
+  draw();
+}
+function slots(){
+  const sym=['🍒','🍋','🔔','⭐','💎','7️⃣'],pick=()=>sym[Math.floor(Math.random()*sym.length)];
+  const misses=['So close!','Almost! The third reel slipped.','Unlucky. Statistically impossible, but unlucky.','The machine is definitely not rigged.'];
+  let credits=5;
+  set('<div class="tag">Bandwidth casino</div><h1>Spin to Win WiFi</h1><p>Line up three of a kind to win the password.</p><div class="reels" id="reels"><span>🍒</span><span>🔔</span><span>💎</span></div><p class="center" id="slMsg">Good luck. You\'ll need it.</p><p class="center muted" id="cr">Credits: 5</p>');
+  const reels=[...document.querySelectorAll('#reels span')],msg=document.getElementById('slMsg'),cr=document.getElementById('cr');
+  const spin=btn('Spin (1 credit)',async()=>{
+    if(spin.disabled||!credits)return;spin.disabled=true;credits--;cr.textContent='Credits: '+credits;msg.textContent='Spinning…';
+    for(let i=0;i<14;i++){if(!spin.isConnected)return;reels.forEach(r=>r.textContent=pick());await delay(70)}
+    if(!spin.isConnected)return;
+    if(!credits){
+      reels.forEach(r=>r.textContent='💎');msg.innerHTML='<strong class="success">JACKPOT!!!</strong> You win: 0.00 WiFi.';
+      await delay(2000);if(!spin.isConnected)return;
+      set('<div class="big">🎰</div><h1>Out of credits.</h1><p>The house thanks you for your generous donation of dignity.</p>');$.append(btn('Continue',finish));return;
+    }
+    const a=pick();let b;do b=pick();while(b===a);
+    [a,a,b].forEach((s,i)=>reels[i].textContent=s);
+    msg.textContent=misses[4-credits];spin.disabled=false;
+  });
+  $.append(spin);
+}
+function runaway(){
+  let dodges=0,tired=false;
+  const taunts=['Nope.','Too slow.','Missed me!','Almost.','Are you even trying?','So close.','Ha.','Try the other side.'];
+  set('<div class="tag">Connection</div><h1>Connect to WiFi</h1><p>Just press the button. That\'s all.</p><div class="arena" id="arena"></div><p class="center muted" id="rnMsg">&nbsp;</p>');
+  const arena=document.getElementById('arena'),msg=document.getElementById('rnMsg');
+  const b=btn('Connect to WiFi',()=>tired?finish():hop());
+  const place=(x,y)=>{b.style.left=Math.max(0,Math.min(x,arena.clientWidth-b.offsetWidth))+'px';b.style.top=Math.max(0,Math.min(y,arena.clientHeight-b.offsetHeight))+'px'};
+  function hop(){
+    if(tired)return;dodges++;
+    if(dodges>=12){tired=true;b.textContent='Fine. Click me.';msg.textContent='The button is exhausted.';place(b.offsetLeft,b.offsetTop);return}
+    let x,y;do{x=Math.random()*(arena.clientWidth-b.offsetWidth);y=Math.random()*(arena.clientHeight-b.offsetHeight)}while(Math.hypot(x-b.offsetLeft,y-b.offsetTop)<90);
+    place(x,y);msg.textContent=taunts[dodges%taunts.length];
+  }
+  b.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')hop()});
+  arena.append(b);place((arena.clientWidth-b.offsetWidth)/2,(arena.clientHeight-b.offsetHeight)/2);
+}
+function tos(){
+  let n=0,batches=0;
+  const clauses=['The Guest agrees that the router is always right, even when it is wrong.','Bandwidth is distributed according to vibes.','By reading this sentence you have agreed to read the next sentence.','The Guest waives all rights to complain about buffering, lag, or the general state of things.','Drew reserves the right to rename the network to something embarrassing about you.','Any memes sent over this network become the intellectual property of the router.','The Guest acknowledges that the WiFi password is not "password". It was once. Not anymore.','Streaming in 4K is permitted only on alternate leap years.','The router may, at its sole discretion, take a nap.','The Guest agrees to say "thank you, router" upon each successful page load.','Section 7(b) has been redacted for being too powerful.','In the event of a dispute, the matter shall be settled by rock, paper, scissors. The router always wins.','The Guest consents to being mildly judged for their browser tabs.','These terms may be updated at any time, including right now. They just were.','Scrolling faster does not make this end sooner. It does not end.','The Guest agrees that cats are allowed on the network and dogs require a separate application.'];
+  set('<div class="tag">Legal</div><h1>Terms of Service</h1><p>Scroll to the bottom to accept the terms and connect.</p><div class="tos" id="tos"></div><p class="center muted" id="tosPct">0% read</p>');
+  const box=document.getElementById('tos'),pct=document.getElementById('tosPct');
+  function more(){for(let i=0;i<6;i++){n++;const p=document.createElement('p');p.textContent=`${n}. ${clauses[(n-1)%clauses.length]}`;box.append(p)}}
+  more();more();
+  box.addEventListener('scroll',()=>{
+    pct.textContent=Math.min(99,Math.floor((box.scrollTop+box.clientHeight)/box.scrollHeight*100))+'% read';
+    if(box.scrollTop+box.clientHeight<box.scrollHeight-40)return;
+    more();
+    if(++batches===12)$.append(btn('I agree (I did not read this)',finish));
+  });
+}
+function invasive(){
+  const fields=[['Full legal name (including the embarrassing middle one)','text'],['Social Security Number','numeric'],["Mother's maiden name",'text'],['Credit card number','numeric'],['CVV (the 3 secret digits on the back)','numeric'],['Bank PIN','numeric'],['Blood type','text'],['Deepest fear','text'],['Name of your first pet','text'],['Most embarrassing search this week','text'],['Rate your ex (1-10)','numeric'],['Who would you call to bail you out of jail?','text']];
+  set('<div class="tag">Guest registration</div><h1>Quick Sign-up</h1><p>Just a few standard questions before we connect you.</p><div id="fields"></div><p class="fine">All fields are required by our very real security policy.</p>');
+  const box=document.getElementById('fields');
+  // Values are never read or sent anywhere; people may type real data here.
+  const inputs=fields.map(([label,mode],i)=>{
+    const l=document.createElement('label');l.textContent=label+' *';l.htmlFor='f'+i;
+    const inp=document.createElement('input');inp.id='f'+i;inp.autocomplete='off';inp.inputMode=mode;inp.spellcheck=false;
+    box.append(l,inp);return inp;
+  });
+  $.append(btn('Submit & connect',async()=>{
+    inputs.forEach(i=>i.value='');
+    set('<div class="tag">Processing</div><h1>Uploading to the dark web…</h1><div class="bar"><div class="fill" id="fill"></div></div><p>Finding the highest bidder…</p>');
+    for(let i=0;i<=100;i+=5){document.getElementById('fill').style.width=i+'%';await delay(90)}
+    set('<div class="big">😬</div><h1>Relax, nothing was saved.</h1><p>But you were really about to give us your SSN for WiFi?</p>');
+    $.append(btn('Continue (and rethink your choices)',finish));
+  }));
+}
+function phoneSlider(){
+  const max=9999999999;
+  set(`<div class="tag">Two-factor setup</div><h1>Enter Your Phone Number</h1><p>For accessibility, phone numbers are entered with our convenient slider.</p><div class="phone" id="ph"></div><input type="range" id="rng" min="0" max="${max}" step="1" value="5550000000"><div class="choices" id="tune" style="margin-top:12px"></div><p class="fine center">Tip: hold very still.</p>`);
+  const ph=document.getElementById('ph'),rng=document.getElementById('rng'),tune=document.getElementById('tune');
+  const fmt=v=>{const s=String(Math.round(v)).padStart(10,'0');return `(${s.slice(0,3)}) ${s.slice(3,6)}-${s.slice(6)}`};
+  const setVal=v=>{rng.value=Math.max(0,Math.min(max,Math.round(v)));ph.textContent=fmt(rng.value)};
+  const nudge=sign=>setVal(+rng.value+sign*(1000+Math.random()*5e6));
+  tune.append(btn('− Fine-tune',()=>nudge(-1),'secondary'),btn('+ Fine-tune',()=>nudge(1),'secondary'));
+  rng.addEventListener('input',()=>setVal(+rng.value));setVal(+rng.value);
+  const drift=setInterval(()=>{if(!rng.isConnected)return clearInterval(drift);setVal(+rng.value+(Math.random()-.5)*40000)},1000);
+  $.append(btn('Submit',()=>{
+    clearInterval(drift);const num=fmt(rng.value);
+    set(`<div class="tag">Confirm</div><h1>Is this your number?</h1><div class="phone">${num}</div>`);
+    $.append(btn('Yes',finish),btn('No',()=>{set(`<div class="big">📲</div><h1>Too late.</h1><p>We're texting ${num} instead. Tell them we said hi.</p>`);$.append(btn('Continue',finish))},'secondary'));
+  }));
+}
+const pranks=[goat,shake,captcha,history,ttt,rps,maze,slots,runaway,tos,invasive,phoneSlider];function randomPrank(){pranks[Math.floor(Math.random()*pranks.length)]()}
+const forced=[face,...pranks].find(p=>p.name===new URLSearchParams(location.search).get('p'));forced?forced():face();
 </script></body></html>

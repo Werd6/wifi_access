@@ -1,0 +1,9 @@
+{
+  "name": "wifi-access",
+  "private": true,
+  "description": "A Troll website for my friends.",
+  "type": "module",
+  "dependencies": {
+    "@vercel/blob": "^2.8.2"
+  }
+}
