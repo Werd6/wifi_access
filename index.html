@@ -6,7 +6,19 @@ const $=document.getElementById('screen');
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 const btn=(label,fn,cls='')=>{const b=document.createElement('button');b.textContent=label;b.className=cls;b.addEventListener('click',fn);return b};
 const set=html=>{$.innerHTML=html};
-function finish(){document.body.classList.remove('shaky');set(`<div class="tag">Challenge complete</div><h1 class="success">✓ Guest Access Approved</h1><p>Congratulations. Your dignity was a small price to pay.</p><div class="panel center"><div class="big">📶</div><h2>Ask Drew for the WiFi.</h2><p class="muted">Only Drew can give you the password.</p></div>`);$.append(btn('See the Hall of Fame',()=>{location.href='gallery.html'}),btn('Try another challenge',randomPrank,'secondary'));}
+const LOCK='wifiLock';
+const getLock=()=>{try{return JSON.parse(localStorage.getItem(LOCK))}catch(e){return null}};
+const saveLock=l=>{try{localStorage.setItem(LOCK,JSON.stringify(l))}catch(e){}};
+const clearLock=()=>{try{localStorage.removeItem(LOCK)}catch(e){}};
+function enterRigged(name){let l=getLock();if(!l||l.game!==name){l={game:name,losses:0,since:Date.now()};saveLock(l)}return l}
+function lost(name,retry){
+  const l=enterRigged(name);l.losses++;saveLock(l);
+  const note=document.createElement('p');note.className='center muted';
+  note.textContent=l.losses<3?`Losses: ${l.losses}/3. Lose 3 times to unlock a different challenge.`:'A different challenge is now unlocked. Or keep losing. Your call.';
+  $.append(note,btn('Try again',retry));
+  if(l.losses>=3)$.append(btn('Try a new challenge',()=>{clearLock();randomPrank(name)},'secondary'));
+}
+function finish(){clearLock();document.body.classList.remove('shaky');set(`<div class="tag">Challenge complete</div><h1 class="success">✓ Guest Access Approved</h1><p>Congratulations. Your dignity was a small price to pay.</p><div class="panel center"><div class="big">📶</div><h2>Ask Drew for the WiFi.</h2><p class="muted">Only Drew can give you the password.</p></div>`);$.append(btn('See the Hall of Fame',()=>{location.href='gallery.html'}),btn('Try another challenge',randomPrank,'secondary'));}
 function face(){
   set(`<div class="tag">Identity verification</div><h1>Facial Recognition Required</h1><p>To request guest WiFi, allow camera access and take a selfie for our very serious face scan.</p><div class="panel center" id="camBox"><div class="big">📷</div><p>Camera is off</p></div><p class="fine">Heads up: your selfie gets saved to the Hall of Fame for other guests to admire.</p>`);
   const box=document.getElementById('camBox');
@@ -118,6 +130,7 @@ function captcha(){
 }
 function history(){set('<div class="tag">Guest network</div><h1>Connect to WiFi?</h1><p>Tap below to connect to the guest network.</p>');$.append(btn('Connect to WiFi',async()=>{set('<h1>Scanning Search History</h1><div class="bar"><div class="fill" id="fill"></div></div>');for(let i=0;i<=100;i+=5){document.getElementById('fill').style.width=i+'%';await delay(85)}set('<div class="big">🤨</div><h1>Wow, that was pretty weird bro.</h1>');$.append(btn('Continue',finish));}));}
 function ttt(){
+  enterRigged('ttt');
   const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   const b=Array(9).fill('');let over=false;
   set('<div class="tag">Network game</div><h1>Beat the Router at Tic Tac Toe</h1><p>Win one game and the WiFi is yours. You are X.</p><div class="board" id="board"></div><p class="center" id="msg">Your move.</p>');
@@ -128,7 +141,7 @@ function ttt(){
   const empty=()=>b.map((v,i)=>v?-1:i).filter(i=>i>=0);
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   function best(){for(const p of['O','X'])for(const l of lines){const e=l.filter(i=>!b[i]);if(e.length===1&&l.filter(i=>b[i]===p).length===2)return e[0]}return b[4]?pick(empty()):4}
-  function end(text){over=true;draw();msg.textContent=text.trim();$.append(btn('Continue',finish))}
+  function end(text){over=true;draw();msg.textContent=text.trim();lost('ttt',ttt)}
   async function play(i){
     if(over||b[i])return;b[i]='X';over=true;draw();let cheat='';
     if(winner('X')){
@@ -152,6 +165,7 @@ function ttt(){
   draw();
 }
 function rps(){
+  enterRigged('rps');
   const beats={Rock:'Paper',Paper:'Scissors',Scissors:'Rock'},icon={Rock:'🪨',Paper:'📄',Scissors:'✂️'};
   let losses=0,target=2;
   function show(note){
@@ -165,17 +179,18 @@ function rps(){
       msg.textContent=`${r} beats ${k}. Router wins the round.`;
       await delay(1200);if(!box.isConnected)return;
       if(losses===1&&target===2){target=3;return show('Rule update: this is now best of 5.')}
-      if(losses>=target){set(`<div class="big">🏆</div><h1>Router wins ${losses}-0.</h1><p>The router read your mind. It does that.</p>`);$.append(btn('Continue',finish));return}
+      if(losses>=target){set(`<div class="big">🏆</div><h1>Router wins ${losses}-0.</h1><p>The router read your mind. It does that.</p>`);lost('rps',rps);return}
       show();
     })));
   }
   show();
 }
 function maze(){
+  const lock=enterRigged('maze');
   const g=['#########','#...#...#','#.#.#.#.#','#.#...#.#','#.#####.#','#...#...#','###.#.#.#','#.....#.#','#########'].map(r=>[...r]);
-  let pos=[1,1],exits=[[0,7],[4,8],[8,1],[0,3]],exit=[8,7],moves=0;g[8][7]='E';
-  set('<div class="tag">Network routing</div><h1>Find the Exit</h1><p>Guide your packet 🔵 to the exit 🚪 to connect. Use the arrows or your keyboard.</p><div class="mazegrid" id="mz" style="grid-template-columns:repeat(9,1fr)"></div><p class="center" id="mzMsg">Packet ready.</p><div class="pad" id="pad"></div>');
-  const mz=document.getElementById('mz'),msg=document.getElementById('mzMsg'),pad=document.getElementById('pad');
+  let pos=[1,1],exits=[[0,7],[4,8],[8,1],[0,3]],exit=[8,7],timer;g[8][7]='E';
+  set('<div class="tag">Network routing</div><h1>Find the Exit</h1><p>Guide your packet 🔵 to the exit 🚪 to connect. Use the arrows or your keyboard.</p><div class="mazegrid" id="mz" style="grid-template-columns:repeat(9,1fr)"></div><p class="center" id="mzMsg">Packet ready.</p><div class="pad" id="pad"></div><p class="center muted" id="mzTimer"></p>');
+  const mz=document.getElementById('mz'),msg=document.getElementById('mzMsg'),pad=document.getElementById('pad'),timerEl=document.getElementById('mzTimer');
   const draw=()=>{mz.innerHTML=g.map((r,y)=>r.map((c,x)=>`<div class="${c==='#'?'wall':''}">${y===pos[0]&&x===pos[1]?'🔵':c==='E'?'🚪':''}</div>`).join('')).join('')};
   const near=(a,b)=>Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1])===1;
   function move(dy,dx){
@@ -186,16 +201,24 @@ function maze(){
       const options=exits.filter(e=>!near(pos,e));
       if(options.length){exit=options[Math.floor(Math.random()*options.length)];exits=exits.filter(e=>e!==exit);g[exit[0]][exit[1]]='E';msg.textContent='The exit has been relocated for your security.'}
       else{exit=[-9,-9];msg.textContent='All exits have been permanently relocated. Into the void.'}
-      if(++moves===3)$.append(btn('Give up',()=>{removeEventListener('keydown',key);finish()},'secondary'));
     }
     draw();
   }
   function key(e){if(!mz.isConnected){removeEventListener('keydown',key);return}const d={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[e.key];if(d){e.preventDefault();move(...d)}}
   addEventListener('keydown',key);
   [[null],['↑',-1,0],[null],['←',0,-1],['↓',1,0],['→',0,1]].forEach(([label,dy,dx])=>pad.append(label?btn(label,()=>move(dy,dx),'secondary'):document.createElement('div')));
+  function tick(){
+    if(!mz.isConnected)return clearInterval(timer);
+    const left=Math.ceil((lock.since+60000-Date.now())/1000);
+    if(left>0){timerEl.textContent=`A different challenge unlocks in ${left}s`;return}
+    clearInterval(timer);timerEl.textContent='';
+    $.append(btn('Try a new challenge',()=>{removeEventListener('keydown',key);clearLock();randomPrank('maze')},'secondary'));
+  }
+  timer=setInterval(tick,1000);tick();
   draw();
 }
 function slots(){
+  enterRigged('slots');
   const sym=['🍒','🍋','🔔','⭐','💎','7️⃣'],pick=()=>sym[Math.floor(Math.random()*sym.length)];
   const misses=['So close!','Almost! The third reel slipped.','Unlucky. Statistically impossible, but unlucky.','The machine is definitely not rigged.'];
   let credits=5;
@@ -208,7 +231,7 @@ function slots(){
     if(!credits){
       reels.forEach(r=>r.textContent='💎');msg.innerHTML='<strong class="success">JACKPOT!!!</strong> You win: 0.00 WiFi.';
       await delay(2000);if(!spin.isConnected)return;
-      set('<div class="big">🎰</div><h1>Out of credits.</h1><p>The house thanks you for your generous donation of dignity.</p>');$.append(btn('Continue',finish));return;
+      set('<div class="big">🎰</div><h1>Out of credits.</h1><p>The house thanks you for your generous donation of dignity.</p>');lost('slots',slots);return;
     }
     const a=pick();let b;do b=pick();while(b===a);
     [a,a,b].forEach((s,i)=>reels[i].textContent=s);
@@ -280,6 +303,8 @@ function phoneSlider(){
     $.append(btn('Yes',finish),btn('No',()=>{set(`<div class="big">📲</div><h1>Too late.</h1><p>We're texting ${num} instead. Tell them we said hi.</p>`);$.append(btn('Continue',finish))},'secondary'));
   }));
 }
-const pranks=[goat,shake,captcha,history,ttt,rps,maze,slots,runaway,tos,invasive,phoneSlider];function randomPrank(){pranks[Math.floor(Math.random()*pranks.length)]()}
-const forced=[face,...pranks].find(p=>p.name===new URLSearchParams(location.search).get('p'));forced?forced():face();
+const pranks=[goat,shake,captcha,history,ttt,rps,maze,slots,runaway,tos,invasive,phoneSlider];function randomPrank(exclude){const pool=pranks.filter(p=>p.name!==exclude);pool[Math.floor(Math.random()*pool.length)]()}
+const forced=[face,...pranks].find(p=>p.name===new URLSearchParams(location.search).get('p'));
+const lock=getLock(),resume=lock&&pranks.find(p=>p.name===lock.game);
+forced?forced():resume?resume():face();
 </script></body></html>
