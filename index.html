@@ -28,7 +28,7 @@ function face(){
         set('<div class="tag">Analyzing facial structure</div><h1>Face scan in progress…</h1><div class="bar"><div class="fill" id="fill"></div></div><p>Checking biometric confidence…</p>');
         for(let i=0;i<=100;i+=10){document.getElementById('fill').style.width=i+'%';await delay(180)}
         const insults=['Face recognized. Unfortunately, so is the disappointment.','Biometrics passed. Your haircut did not.','Identity confirmed. The router wishes it had not looked.','Face detected. Confidence in your life choices: 2%.','Your face is valid. Your vibes are not.'];
-        set(`<div class="tag error">Facial evaluation complete</div><div class="big">🤨</div><h1>Identity confirmed.</h1><p>${insults[Math.floor(Math.random()*insults.length)]}</p>`);
+        set(`<div class="tag error">Facial evaluation complete</div><div class="big">🤨</div><h1>Chud Detected.</h1><p>${insults[Math.floor(Math.random()*insults.length)]}</p>`);
         $.append(btn('Accept humiliation & continue',finish));
       });$.append(verify);
     });$.append(capture);
