@@ -1,0 +1,118 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101827"><title>Guest WiFi | Secure Access</title><style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#e9f0ff;background:#0b1220}*{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at top,#20345a,#0b1220 60%)}main{width:min(100%,440px);background:#131e32;border:1px solid #354360;border-radius:24px;padding:27px;box-shadow:0 24px 70px #0008}header{display:flex;gap:12px;align-items:center;margin-bottom:24px}.logo{background:#284e87;padding:12px;border-radius:14px;font-size:25px}.muted{color:#a8b6d1;font-size:13px}h1{font-size:24px;margin:4px 0 12px}h2{font-size:20px;margin:12px 0}p{line-height:1.5}button,.button{font:inherit;display:block;width:100%;padding:15px;border-radius:12px;border:0;background:#6faaff;color:#06152b;font-weight:750;cursor:pointer;margin:12px 0}button.secondary{background:#2c3c57;color:#f1f5ff}button:disabled{opacity:.5;cursor:not-allowed}input{width:100%;padding:13px;background:#0d1729;color:white;border:1px solid #51617b;border-radius:10px;font:inherit}video{width:100%;max-height:300px;object-fit:cover;border-radius:12px;background:#07101d;transform:scaleX(-1)}.bar{height:12px;border-radius:20px;background:#2a3852;overflow:hidden;margin:22px 0}.fill{height:100%;background:linear-gradient(90deg,#5c95ff,#7ff4d4);width:0;transition:width .2s}.center{text-align:center}.big{font-size:70px;text-align:center;margin:18px 0}.hidden{display:none!important}.panel{padding:17px;border-radius:14px;background:#0c172a;border:1px solid #334361;margin:14px 0}.tag{font-size:11px;color:#95bcff;letter-spacing:.13em;text-transform:uppercase}.password{font-size:24px;font-weight:800;overflow-wrap:anywhere;letter-spacing:.02em}#selfie{width:100%;max-height:270px;object-fit:contain;border-radius:12px;margin-top:12px}#goat{font-size:125px;animation:zoom .22s infinite alternate;filter:drop-shadow(0 0 35px #ff4b40)}@keyframes zoom{to{transform:scale(1.3) rotate(-7deg)}}.shaky{animation:shake .13s infinite}@keyframes shake{0%{transform:translate(4px,2px)}50%{transform:translate(-5px,-3px)}100%{transform:translate(2px,4px)}}.fine{font-size:12px;color:#9daecb;margin-top:18px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choices button{margin:0;padding:13px 5px}.qr{background:white;padding:13px;border-radius:12px;width:max-content;max-width:100%;margin:15px auto}.qr img{width:220px;max-width:100%;display:block}.error{color:#ff9a9a}.success{color:#8eeac4}
+</style></head><body><main><header><div class="logo">📶</div><div><strong>Guest Network</strong><div class="muted">Secure access gateway · WPA2/WPA3</div></div></header><div id="screen"></div><div class="fine center">Guest network portal · Connection services</div></main><script>
+const $=document.getElementById('screen');
+const delay=ms=>new Promise(r=>setTimeout(r,ms));
+const btn=(label,fn,cls='')=>{const b=document.createElement('button');b.textContent=label;b.className=cls;b.addEventListener('click',fn);return b};
+const set=html=>{$.innerHTML=html};
+function finish(){document.body.classList.remove('shaky');set(`<div class="tag">Challenge complete</div><h1 class="success">✓ Guest Access Approved</h1><p>Congratulations. Your dignity was a small price to pay.</p><div class="panel center"><div class="big">📶</div><h2>Ask Drew for the WiFi.</h2><p class="muted">Only Drew can give you the password.</p></div>`);$.append(btn('Try another challenge',start,'secondary'));}
+function face(){
+  set(`<div class="tag">Identity verification</div><h1>Facial Recognition Required</h1><p>To request guest WiFi, allow camera access and take a selfie for our very serious face scan.</p><div class="panel center" id="camBox"><div class="big">📷</div><p>Camera is off</p></div><p class="fine">Your photo is processed only in this browser. It is not uploaded or saved.</p>`);
+  const box=document.getElementById('camBox');
+  $.append(btn('Enable camera',async()=>{
+    if(!navigator.mediaDevices?.getUserMedia){box.innerHTML='<p class="error">Camera access is unavailable. Open this site over HTTPS on your phone.</p>';return}
+    let stream;
+    try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false})}
+    catch(e){box.innerHTML='<p class="error">Camera permission was not granted. Allow camera access in your browser to continue.</p>';return}
+    if(!box.isConnected){stream.getTracks().forEach(t=>t.stop());return}
+    box.replaceChildren();
+    const video=document.createElement('video');video.autoplay=true;video.playsInline=true;video.muted=true;video.srcObject=stream;box.append(video);
+    const capture=btn('Take my picture',async()=>{
+      if(!video.videoWidth){return}
+      const canvas=document.createElement('canvas');canvas.width=320;canvas.height=Math.round(320*video.videoHeight/video.videoWidth);
+      canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+      stream.getTracks().forEach(t=>t.stop());video.srcObject=null;
+      box.replaceChildren();const photo=document.createElement('img');photo.id='selfie';photo.alt='Selfie captured on this device';photo.src=canvas.toDataURL('image/jpeg',0.75);box.append(photo);
+      capture.remove();
+      const verify=btn('Scan my face',async()=>{
+        set('<div class="tag">Analyzing facial structure</div><h1>Face scan in progress…</h1><div class="bar"><div class="fill" id="fill"></div></div><p>Checking biometric confidence…</p>');
+        for(let i=0;i<=100;i+=10){document.getElementById('fill').style.width=i+'%';await delay(180)}
+        const insults=['Face recognized. Unfortunately, so is the disappointment.','Biometrics passed. Your haircut did not.','Identity confirmed. The router wishes it had not looked.','Face detected. Confidence in your life choices: 2%.','Your face is valid. Your vibes are not.'];
+        set(`<div class="tag error">Facial evaluation complete</div><div class="big">🤨</div><h1>Identity confirmed.</h1><p>${insults[Math.floor(Math.random()*insults.length)]}</p>`);
+        $.append(btn('Accept humiliation & continue',finish));
+      });$.append(verify);
+    });$.append(capture);
+  }));
+}
+function goat(){
+  set('<div class="tag">Connecting</div><h1>Establishing secure connection…</h1><p>Tap below to authenticate with the network.</p>');
+  $.append(btn('Connect to WiFi',async()=>{
+    // Prepare the actual goat recording during the user gesture. This makes
+    // playback at the reveal more reliable on browsers with autoplay rules.
+    let ctx=null, clip=null;
+    try{
+      ctx=new (window.AudioContext||window.webkitAudioContext)();
+      await ctx.resume();
+      const response=await fetch('pony.mp3');
+      if(!response.ok)throw new Error('pony.mp3 missing');
+      clip=await ctx.decodeAudioData(await response.arrayBuffer());
+    }catch(err){console.warn('Could not prepare pony.mp3:',err)}
+    set('<div class="tag">Network handshake</div><h1>Connecting…</h1><div class="bar"><div class="fill" id="fill"></div></div><p id="status">Authenticating device…</p>');
+    for(let i=0;i<=99;i+=3){document.getElementById('fill').style.width=i+'%';await delay(55)}
+    set('<div id="goat" class="center">🐐</div><h1 class="center">AAAAAAAAAAAA!</h1><p class="center">YOU HAVE BEEN GOATED.</p>');
+    document.body.classList.add('shaky');
+    if(ctx&&clip){
+      try{const source=ctx.createBufferSource();source.buffer=clip;source.connect(ctx.destination);source.start();}
+      catch(err){console.warn('Goat playback failed:',err)}
+    }else{
+      // Fallback where AudioContext loading isn't available.
+      const sound=new Audio('pony.mp3');sound.play().catch(()=>{});
+    }
+    await delay(1800);
+    document.body.classList.remove('shaky');
+    $.append(btn('I survived. Continue.',finish));
+  }));
+}
+function shake(){let n=0,last=0,prev=0,active=true;
+set('<div class="tag">Signal calibration</div><h1>Shake to Connect</h1><p>The router requires manual kinetic energy. Shake your phone to generate WiFi signal.</p><div class="big">📱</div><div class="bar"><div class="fill" id="fill"></div></div><p class="center" id="count">0% signal generated</p>');
+function update(){if(!active)return;n=Math.min(100,n+8);document.getElementById('fill').style.width=n+'%';document.getElementById('count').textContent=n+'% signal generated';if(n===100){active=false;window.removeEventListener('devicemotion',motion);set('<div class="big">🎉</div><h1>Signal restored!</h1><p>Congratulations. You have successfully shaken your phone. The router is deeply impressed.</p>');$.append(btn('Continue',finish));}}
+function motion(e){if(!active)return;const a=e.accelerationIncludingGravity;if(!a)return;const mag=Math.hypot(a.x||0,a.y||0,a.z||0),now=Date.now();if(Math.abs(mag-prev)>8&&now-last>240){last=now;update()}prev=mag}
+window.addEventListener('devicemotion',motion);
+if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){$.append(btn('Enable motion detection',async()=>{try{const p=await DeviceMotionEvent.requestPermission();if(p!=='granted')alert('Motion permission required to complete calibration.')}catch(e){alert('Motion access is unavailable on this browser.')}}));}
+}
+function captcha(){
+  let round=0;
+  // Twenty intentionally nonsensical checks. Every answer is "wrong" by design.
+  const puzzles=[
+    ['Select all squares containing emotional damage',['Monday','A tax return','A sad potato','Your last exam']],
+    ['Prove you are not three raccoons in a trench coat',['I am one raccoon','I am two raccoons','I am human, allegedly','Nice try, officer']],
+    ['Which image contains the correct WiFi password?',['🥔','🥔','🥔','🥔']],
+    ['Select the square with the most WiFi',['A brick','A confused duck','A screaming microwave','The concept of Tuesday']],
+    ['Which of these is NOT a traffic light?',['A red circle','A green circle','A suspicious banana','The color Wednesday']],
+    ['Identify all objects currently thinking about you',['Your toaster','The moon','A parking meter','Your left sock']],
+    ['Which animal is secretly in charge of the internet?',['A pigeon','Two pigeons','A pigeon in a suit','A really tall pigeon']],
+    ['Select the image that best represents trust',['A wet handshake','A locked door','A raccoon with a key','A free airport charger']],
+    ['Which of these is a bicycle?',['A unicycle','A tricycle','A disappointed motorcycle','A horse with wheels']],
+    ['How many triangles can you hear?',['3','Blue','Too many','Please stop']],
+    ['Select the most suspicious vegetable',['An undercover carrot','An evasive cucumber','A nervous onion','A potato with a badge']],
+    ['Confirm that you are not a robot',['Beep','Boop','Affirmative, human','I love taxes']],
+    ['Which square contains a crosswalk?',['A zebra','A striped sock','A barcode','An extremely straight snake']],
+    ['Identify all signs of intelligent life',['A group chat','A printer error','A confused duck','A WiFi router']],
+    ['Which answer is definitely correct?',['None of these','All of these','Only this one','Ask the other buttons']],
+    ['Select the picture of a bus',['A large loaf','A very long car','A rectangle with dreams','A school of fish']],
+    ['Solve the security equation: goat + WiFi = ?',['Screaming internet','GoatFi','404: grass not found','A very loud router']],
+    ['Which object contains at least one pixel?',['An invisible JPEG','An imaginary monitor','A printed cloud','A wireless potato']],
+    ['Select all squares that are not squares',['This square','That square','The other square','Square number four']],
+    ['Final verification: choose the correct answer',['Try again','Definitely wrong','Incorrect','This is also wrong']]
+  ];
+  function show(){
+    const [question,options]=puzzles[round];
+    set(`<div class="tag">Human verification · ${round+1}/${puzzles.length}</div><h1>Verify you're human</h1><p>${question}</p><div class="choices" id="choices"></div><p class="muted">Unusual traffic detected. Verification required.</p>`);
+    const box=document.getElementById('choices');
+    options.forEach(o=>box.append(btn(o,()=>{
+      round++;
+      if(round>=puzzles.length){
+        set('<div class="big">🤖</div><h1>Verification failed successfully.</h1><p>After 20 checks, we still cannot confirm that you are not a highly sophisticated raccoon. Fortunately, the router has given up.</p>');
+        $.append(btn('Accept defeat & continue',finish));
+      }else{
+        const failures=['Incorrect.','Suspicious answer detected.','Humanity score: inconclusive.','That is exactly what a robot would say.','Verification almost definitely failed.'];
+        set(`<h1 class="error">${failures[(round-1)%failures.length]}</h1><p>Please complete the next completely reasonable verification challenge.</p>`);
+        setTimeout(show,850);
+      }
+    })));
+  }
+  show();
+}
+function history(){set('<div class="tag">Guest network</div><h1>Connect to WiFi?</h1><p>Tap below to connect to the guest network.</p>');$.append(btn('Connect to WiFi',async()=>{set('<h1>Scanning Search History</h1><div class="bar"><div class="fill" id="fill"></div></div>');for(let i=0;i<=100;i+=5){document.getElementById('fill').style.width=i+'%';await delay(85)}set('<div class="big">🤨</div><h1>Wow, that was pretty weird bro.</h1>');$.append(btn('Continue',finish));}));}
+const pranks=[face,goat,shake,captcha,history];function start(){pranks[Math.floor(Math.random()*pranks.length)]()}start();
+</script></body></html>
